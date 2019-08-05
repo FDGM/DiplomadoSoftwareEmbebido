@@ -15,7 +15,7 @@ bool bfMainTickElapsed = false;
 int u16TickCnt = C_MAIN_TICK_MS;
 timer_size_t counts = 0;
 
-
+// Prueba ADC
 void sensor_thread_entry(void)
 {
     g_adc0.p_api->open(g_adc0.p_ctrl, g_adc0.p_cfg);
