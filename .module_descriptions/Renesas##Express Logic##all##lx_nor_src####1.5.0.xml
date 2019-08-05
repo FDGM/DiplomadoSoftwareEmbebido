@@ -1,0 +1,306 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<synergyModuleDescription>
+  <!-- LevelX Common -->
+  <config id="config.el.lx_common" path="ssp_cfg/framework/el/lx_src_user.h" version="0">
+    <!-- LevelX Common Config Properties -->
+    <property id="config.el.lx_nor_src.lx_thread_safe"
+              display="Thread Safety"
+              default="config.el.lx_nor_src.lx_thread_safe.disabled"
+              description="If Enabled, this makes LevelX thread-safe by using a ThreadX mutex object throughout the API.">
+      <option id="config.el.lx_nor_src.lx_thread_safe.enabled" display="Enabled" value="1" />
+      <option id="config.el.lx_nor_src.lx_thread_safe.disabled" display="Disabled" value="0" />
+    </property>
+
+    <!-- Header Content -->
+    <content>
+      #if (${config.el.lx_nor_src.lx_thread_safe})
+      #define LX_THREAD_SAFE_ENABLE
+      #endif
+    </content>
+
+  </config>
+  <module config="config.el.lx_common" display="X-Ware|LevelX|LevelX Common" id="module.el.lx_common" common="1"
+          version="1">
+    <requires interface="_rtos" />
+    <provides interface="interface.el.lx_common" />
+    <header> </header>
+    <includes> </includes>
+    <declarations> </declarations>
+    <init></init>
+  </module>
+
+
+  <!-- LevelX NOR Common -->
+  <config id="config.el.lx_nor_src" path="ssp_cfg/framework/el/lx_nor_src_user.h" version="0">
+    <!-- LevelX NOR Common Config Properties -->
+    <property id="config.el.lx_nor_src.lx_direct_read"
+              display="Bypass the NOR flash driver read."
+              default="config.el.lx_nor_src.lx_direct_read.disabled"
+              description="If Enabled, this option bypasses the NOR flash driver read routine in favor or reading the NOR memory directly, resulting in a significant performance increase.">
+      <option id="config.el.lx_nor_src.lx_direct_read.enabled" display="Enabled" value="1" />
+      <option id="config.el.lx_nor_src.lx_direct_read.disabled" display="Disabled" value="0" />
+    </property>
+
+    <property id="config.el.lx_nor_src.lx_free_sector_data_verify"
+              display="Verify free NOR sectors are all ones."
+              default="config.el.lx_nor_src.lx_free_sector_data_verify.disabled"
+              description="If Enabled, this causes the LevelX NOR instance open logic to verify free NOR sectors are all ones.">
+      <option id="config.el.lx_nor_src.lx_free_sector_data_verify.enabled" display="Enabled" value="1" />
+      <option id="config.el.lx_nor_src.lx_free_sector_data_verify.disabled" display="Disabled" value="0" />
+    </property>
+
+    <property id="config.el.lx_nor_src.lx_nor_sector_mapping_cache_size"
+              display="Logical sector mapping cache size."
+              default="16"
+              description="By default this value is 16 and defines the logical sector mapping cache size. Large values improve performance, but cost memory. The minimum size is 8 and all values must be a power of 2.">
+      <constraint display="Value must be greater than 8 and power of 2 ">
+        testInteger("${config.el.lx_nor_src.lx_nor_sector_mapping_cache_size}")  &amp;&amp;
+        ("${config.el.lx_nor_src.lx_nor_sector_mapping_cache_size}" &gt;= 8) &amp;&amp;
+        ( ("${config.el.lx_nor_src.lx_nor_sector_mapping_cache_size}" &amp;
+          ("${config.el.lx_nor_src.lx_nor_sector_mapping_cache_size}" - 1)) === 0)
+      </constraint>
+    </property>
+
+    <!-- Header Content -->
+    <content>
+      #if (${interface.el.lx_common})
+      #include "lx_src_user.h"
+      #endif
+      #if (${config.el.lx_nor_src.lx_direct_read})
+      #define LX_DIRECT_READ
+      #else
+      /** If direct read disabled LevelX requires a buffer of a sector size i.e 512 bytes or 128 words */
+      #define SSP_LX_READ_BUFFER_SIZE_WORDS (128U)
+      #endif
+      #if (${config.el.lx_nor_src.lx_free_sector_data_verify})
+      #define LX_FREE_SECTOR_DATA_VERIFY
+      #endif
+      #define LX_NOR_SECTOR_MAPPING_CACHE_SIZE (${config.el.lx_nor_src.lx_nor_sector_mapping_cache_size})
+    </content>
+
+  </config>
+
+  <module config="config.el.lx_nor_src"
+          display="X-Ware|LevelX|LevelX NOR Common"
+          id="module.el.lx_nor_common"
+          common="1"
+          version="1">
+    <!-- LevelX NOR Common Module Dependencies -->
+    <requires interface="_rtos" />
+    <requires id="module.el.lx_nor_common.requires.lx_common"
+              interface="interface.el.lx_common"
+              display="Add LevelX Common" />
+
+    <!-- LevelX NOR Common Module Exports -->
+    <provides interface="interface.el.lx_nor_common" />
+
+    <!-- LevelX NOR Common Module Properties -->
+    <property default="lx_nor_common_init${_instance}"
+              display="Name of generated LevelX initialization function"
+              id="module.el.lx_nor_common.init_function"
+              description="LevelX NOR common initialization function name.">
+      <constraint display="Name must be a valid C symbol">
+        testSymbol("${module.el.lx_nor_common.init_function}")
+      </constraint>
+    </property>
+
+    <property default="module.el.lx_nor_common.init.enable"
+              display="Auto Initialization LevelX NOR Common"
+              id="module.el.lx_nor_common.init"
+              description="Control auto initialization of LevelX NOR Common">
+      <option display="Enable"  id="module.el.lx_nor_common.init.enable"  value="1"/>
+      <option display="Disable" id="module.el.lx_nor_common.init.disable" value="0"/>
+    </property>
+
+    <!-- LevelX NOR Common Module Instance header content -->
+    <header>
+      void ${module.el.lx_nor_common.init_function}(void);
+    </header>
+
+    <includes>
+      #include "lx_api.h"
+    </includes>
+    <declarations>
+
+      /** Define LevelX NOR common initialization */
+      #define LX_NOR_COMMON_INITIALIZE (${module.el.lx_nor_common.init})
+
+      /***********************************************************************************************************************
+        * @brief     Initialization function that the user can choose to have called automatically during thread entry.
+        *            The user can call this function at a later time if desired using the prototype below.
+        *            - void ${module.el.lx_nor_common.init_function}(void)
+        **********************************************************************************************************************/
+      void ${module.el.lx_nor_common.init_function}(void)
+      {
+          /** Initialize the LevelX NOR Flash system. */
+          lx_nor_flash_initialize();
+      }
+
+    </declarations>
+    <init>
+
+      /** Call initialization function if user has selected to do so. */
+      #if LX_NOR_COMMON_INITIALIZE
+          ${module.el.lx_nor_common.init_function}();
+      #endif
+
+    </init>
+  </module>
+
+  <!-- LevelX NOR Instance -->
+  <module  id="module.el.lx_nor_src" display="X-Ware|LevelX|${module.el.lx_nor_src.name} LevelX NOR" version="1">
+    <!-- Because LevelX is distributed only as source linker warnings not observed -->
+    <!-- LevelX NOR Instance constraint -->
+    <constraint display="Module instances must have unique names">
+      "${interface.el.lx_nor_src.${module.el.lx_nor_src.name}}" === "1"
+    </constraint>
+
+    <!-- LevelX NOR Instance Dependencies -->
+    <requires interface="_rtos" />
+    <requires id="module.el.lx_src.requires.lx_nor_common"
+              interface="interface.el.lx_nor_common"
+              display="Add LevelX NOR Common"/>
+    <requires id="module.el.lx_src.requires.sf_el_lx_nor"
+              interface="interface.framework.sf_el_lx_nor"
+              display="Add sf_el_lx_nor" />
+
+    <!-- LevelX NOR Instance Exports -->
+    <provides interface="interface.el.lx_nor_src_flash" />
+    <provides interface="interface.el.lx_nor_src" />
+    <provides interface="interface.el.lx_nor_src.${module.el.lx_nor_src.name}" />
+
+    <!-- LevelX NOR Instance Properties -->
+    <property id="module.el.lx_nor_src.name"
+              display="Name"
+              default="g_lx_nor${_instance}"
+              description="Module Name.">
+      <constraint display="Name must be a valid C symbol">testSymbol("${module.el.lx_nor_src.name}")</constraint>
+    </property>
+
+    <!-- LevelX NOR Instance header content -->
+    <header>
+      #include "lx_api.h"
+    </header>
+
+    <declarations>
+
+      /** LevelX NOR Instance */
+      LX_NOR_FLASH ${module.el.lx_nor_src.name};
+      #ifndef LX_DIRECT_READ
+      ULONG ${module.el.lx_nor_src.name}_ReadBuffer[SSP_LX_READ_BUFFER_SIZE_WORDS] = {0};
+      #endif
+
+      /** WEAK system error call back */
+      #if defined(__ICCARM__)
+      #define ${module.el.lx_nor_src.name}_system_error_WEAK_ATTRIBUTE
+      #pragma weak ${module.el.lx_nor_src.name}_system_error  = ${module.el.lx_nor_src.name}_system_error_internal
+      #elif defined(__GNUC__)
+      #define ${module.el.lx_nor_src.name}_system_error_WEAK_ATTRIBUTE   \
+              __attribute__ ((weak, alias("${module.el.lx_nor_src.name}_system_error_internal")))
+      #endif
+
+      UINT ${module.el.lx_nor_src.name}_system_error(UINT error_code) ${module.el.lx_nor_src.name}_system_error_WEAK_ATTRIBUTE;
+      /*****************************************************************************************************************//**
+      * @brief      This is a weak example initialization error function.  It should be overridden by defining a user  function
+      *             with the prototype below.
+      *             - void ${module.el.lx_nor_src.name}_system_error(UINT error_code)
+      *
+      * @param[in]  error_code represents the error that occurred.
+      **********************************************************************************************************************/
+      UINT ${module.el.lx_nor_src.name}_system_error_internal(UINT error_code);
+      UINT ${module.el.lx_nor_src.name}_system_error_internal(UINT error_code)
+      {
+        /** Suppress compiler warning for not using parameters. */
+        SSP_PARAMETER_NOT_USED(error_code);
+
+        /** An error has occurred. Please check function arguments for more information. */
+        BSP_CFG_HANDLE_UNRECOVERABLE_ERROR(0);
+
+        return LX_ERROR;
+      }
+
+      /** LevelX NOR instance "Read Sector" service */
+      static UINT ${module.el.lx_nor_src.name}_read(ULONG *flash_address, ULONG *destination, ULONG words){
+        ssp_err_t err;
+
+        err = SF_EL_LX_NOR_Read(&amp;${module.el.lx_src.requires.sf_el_lx_nor::module.framework.sf_el_lx_nor.name}_ctrl, flash_address, destination, words);
+        if (SSP_SUCCESS != err)
+        {
+            return (LX_ERROR);
+        }
+        return LX_SUCCESS;
+      }
+
+      /** LevelX NOR instance "Write Sector" service */
+      static UINT ${module.el.lx_nor_src.name}_write(ULONG *flash_address, ULONG *source, ULONG words) {
+        ssp_err_t err;
+
+        err = SF_EL_LX_NOR_Write(&amp;${module.el.lx_src.requires.sf_el_lx_nor::module.framework.sf_el_lx_nor.name}_ctrl, flash_address, source, words);
+        if (SSP_SUCCESS != err)
+        {
+            return (LX_ERROR);
+        }
+        return LX_SUCCESS;
+      }
+
+      /** LevelX NOR instance "Block Erase" service */
+      static UINT ${module.el.lx_nor_src.name}_block_erase(ULONG block, ULONG block_erase_count) {
+        ssp_err_t err;
+
+        err = SF_EL_LX_NOR_BlockErase(&amp;${module.el.lx_src.requires.sf_el_lx_nor::module.framework.sf_el_lx_nor.name}_ctrl, block, block_erase_count);
+        if (SSP_SUCCESS != err)
+        {
+            return (LX_ERROR);
+        }
+        return LX_SUCCESS;
+      }
+
+      /** LevelX NOR instance "Block Erased Verify" service */
+      static UINT ${module.el.lx_nor_src.name}_block_erased_verify(ULONG block) {
+         ssp_err_t err;
+
+         err = SF_EL_LX_NOR_BlockErasedVerify(&amp;${module.el.lx_src.requires.sf_el_lx_nor::module.framework.sf_el_lx_nor.name}_ctrl, block);
+         if (SSP_SUCCESS != err)
+         {
+             return (LX_ERROR);
+         }
+         return LX_SUCCESS;
+      }
+
+      /** LevelX NOR instance "Driver Initialization" service */
+      static UINT ${module.el.lx_nor_src.name}_initialize(LX_NOR_FLASH *p_nor_flash) {
+        ssp_err_t err;
+
+        /** Make a copy of config structure as we can't change the constant one and update LevelX NOR Flash pointer */
+        sf_el_lx_nor_instance_cfg_t ${module.el.lx_src.requires.sf_el_lx_nor::module.framework.sf_el_lx_nor.name}_cfg_copy = ${module.el.lx_src.requires.sf_el_lx_nor::module.framework.sf_el_lx_nor.name}_cfg;
+        ${module.el.lx_src.requires.sf_el_lx_nor::module.framework.sf_el_lx_nor.name}_cfg_copy.p_lx_nor_flash = p_nor_flash;
+
+
+        /** Open the sf_el_lx_nor driver */
+        err = SF_EL_LX_NOR_Open(&amp;${module.el.lx_src.requires.sf_el_lx_nor::module.framework.sf_el_lx_nor.name}_ctrl, &amp;${module.el.lx_src.requires.sf_el_lx_nor::module.framework.sf_el_lx_nor.name}_cfg_copy);
+
+        if(SSP_SUCCESS != err)
+        {
+            return(LX_ERROR);
+        }
+
+         #ifndef LX_DIRECT_READ
+         /** lx_nor_flash_sector_buffer is used only when LX_DIRECT_READ disabled */
+         p_nor_flash -> lx_nor_flash_sector_buffer = &amp;${module.el.lx_nor_src.name}_ReadBuffer[0];
+         #endif
+         p_nor_flash -> lx_nor_flash_driver_read = ${module.el.lx_nor_src.name}_read;
+         p_nor_flash -> lx_nor_flash_driver_write = ${module.el.lx_nor_src.name}_write;
+         p_nor_flash -> lx_nor_flash_driver_block_erase = ${module.el.lx_nor_src.name}_block_erase;
+         p_nor_flash -> lx_nor_flash_driver_block_erased_verify = ${module.el.lx_nor_src.name}_block_erased_verify;
+         p_nor_flash -> lx_nor_flash_driver_system_error = ${module.el.lx_nor_src.name}_system_error;
+         return LX_SUCCESS;
+      }
+
+      /** LevelX NOR instance "Driver Close" service */
+      static ssp_err_t ${module.el.lx_nor_src.name}_close() {
+        return SF_EL_LX_NOR_Close(&amp;${module.el.lx_src.requires.sf_el_lx_nor::module.framework.sf_el_lx_nor.name}_ctrl);
+      }
+    </declarations>
+
+  </module>
+</synergyModuleDescription>

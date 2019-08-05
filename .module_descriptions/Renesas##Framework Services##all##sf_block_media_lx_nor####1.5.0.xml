@@ -1,0 +1,105 @@
+﻿<?xml version="1.0" ?>
+<synergyModuleDescription>
+  <!-- Block Media LevelX NOR -->
+  <config id="config.framework.block_media_lx_nor"
+          path="ssp_cfg/framework/sf_block_media_lx_nor_cfg.h"
+          version="0">
+
+    <!-- Block Media LevelX NOR Common Properties -->
+    <property default="config.framework.block_media_lx_nor.param_checking_enable.bsp"
+              display="Parameter Checking"
+              id="config.framework.block_media_lx_nor.param_checking_enable"
+              description="Selects if code for parameter checking is to be included in the build.">
+      <option display="Default (BSP)"
+              id="config.framework.block_media_lx_nor.param_checking_enable.bsp"
+              value="(BSP_CFG_PARAM_CHECKING_ENABLE)"/>
+      <option display="Enabled"
+              id="config.framework.block_media_lx_nor.param_checking_enable.enabled"
+              value="(1)"/>
+      <option display="Disabled"
+              id="config.framework.block_media_lx_nor.param_checking_enable.disabled"
+              value="(0)"/>
+    </property>
+
+      <!-- Header content -->
+      <content>
+        #define SF_BLOCK_MEDIA_LX_NOR_CFG_PARAM_CHECKING_ENABLE ${config.framework.block_media_lx_nor.param_checking_enable}
+        #define SF_BLOCK_MEDIA_LX_NOR_BLOCK_SIZE_BYTES (512U)
+      </content>
+  </config>
+
+  <!-- Block Media LevelX Instance -->
+  <module config="config.framework.block_media_lx_nor"
+          display="Framework|File System|${module.framework.block_media.name} Block Media Framework on sf_block_media_lx_nor"
+          id="module.framework.block_media_on_lx_nor"
+          version="1"
+          url="https://knowledgebase.renesas.com/English_Content/Renesas_Synergy%E2%84%A2_Platform/Renesas_Synergy_Knowledge_Base/sf_block_media_lx_nor_Module_Guide_Resources">
+
+      <!-- Module Constraints -->
+      <constraint display="Module instances must have unique names">
+          "${interface.framework.block_media.${module.framework.block_media.name}}" === "1"
+      </constraint>
+
+      <!-- Module Dependencies -->
+      <requires interface="_rtos" />
+      <requires id="module.framework.block_media_on_lx_nor.requires.levelx_nor"
+                interface="interface.el.lx_nor_src_flash"
+                display="Add LevelX NOR Instance" >
+      </requires>
+
+      <!-- Module Exports -->
+      <provides interface="interface.framework.block_media" />
+      <provides interface="interface.framework.block_media_on_sf_block_media_lx_nor" />
+      <provides interface="interface.framework.block_media.${module.framework.block_media.name}" />
+
+      <!-- Module Instance Properties -->
+      <property id="module.framework.block_media.name"
+                display="Name"
+                default="g_sf_block_media_lx_nor${_instance}"
+                description="Module name.">
+        <constraint display="Name must be a valid C symbol">testSymbol("${module.framework.block_media.name}")</constraint>
+      </property>
+      <header>
+
+        /** Block Media on LevelX Instance */
+        extern sf_block_media_instance_t ${module.framework.block_media.name};
+
+      </header>
+      <includes>
+        #include &quot;sf_block_media_lx_nor.h&quot;
+        #include &quot;sf_block_media_lx_nor_cfg.h&quot;
+        #include &quot;sf_block_media_api.h&quot;
+      </includes>
+      <declarations>
+
+        /* Block Media LevelX */
+        /* Block Media LevelX Config */
+        static const sf_block_media_on_lx_nor_cfg_t ${module.framework.block_media.name}_block_media_cfg =
+        {
+          .nor_driver_initialize =  ${module.framework.block_media_on_lx_nor.requires.levelx_nor::module.el.lx_nor_src.name}_initialize,
+          .p_nor_flash = &amp;${module.framework.block_media_on_lx_nor.requires.levelx_nor::module.el.lx_nor_src.name},
+          .p_nor_flash_name = &quot;${module.framework.block_media_on_lx_nor.requires.levelx_nor::module.el.lx_nor_src.name}&quot;,
+          .close = &amp;${module.framework.block_media_on_lx_nor.requires.levelx_nor::module.el.lx_nor_src.name}_close
+        };
+
+        /* Block Media LevelX Instance Control */
+        static sf_block_media_lx_nor_instance_ctrl_t ${module.framework.block_media.name}_ctrl;
+
+        /* Block Media Config */
+        static sf_block_media_cfg_t ${module.framework.block_media.name}_cfg =
+        {
+          .block_size          = SF_BLOCK_MEDIA_LX_NOR_BLOCK_SIZE_BYTES,
+          .p_extend            = &amp;${module.framework.block_media.name}_block_media_cfg
+        };
+
+        /* Block Media Instance  */
+        sf_block_media_instance_t ${module.framework.block_media.name} =
+        {
+          .p_ctrl = &amp;${module.framework.block_media.name}_ctrl,
+          .p_cfg =  &amp;${module.framework.block_media.name}_cfg,
+          .p_api =  &amp;g_sf_block_media_on_sf_block_media_lx_nor
+        };
+
+      </declarations>
+  </module>
+</synergyModuleDescription>

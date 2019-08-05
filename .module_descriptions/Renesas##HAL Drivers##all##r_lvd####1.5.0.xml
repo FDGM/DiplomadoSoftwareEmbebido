@@ -1,0 +1,145 @@
+<?xml version="1.0" ?>
+<synergyModuleDescription>
+    <config id="config.driver.lvd" path="ssp_cfg/driver/r_lvd_cfg.h" version="0">
+        <property default="config.driver.lvd.param_checking_enable.bsp" display="Parameter Checking" id="config.driver.lvd.param_checking_enable" description="If selected code for parameter checking is included in the build.">
+            <option display="Default (BSP)" id="config.driver.lvd.param_checking_enable.bsp" value="(BSP_CFG_PARAM_CHECKING_ENABLE)"/>
+            <option display="Enabled" id="config.driver.lvd.param_checking_enable.enabled" value="(1)"/>
+            <option display="Disabled" id="config.driver.lvd.param_checking_enable.disabled" value="(0)"/>
+        </property>
+        <content>
+        #define LVD_CFG_PARAM_CHECKING_ENABLE ${config.driver.lvd.param_checking_enable}
+        </content>
+    </config>
+    <module config="config.driver.lvd" display="Driver|Power|${module.driver.lvd.name} Low Voltage Detection Driver on r_lvd" id="module.driver.lvd" version="1" url="https://knowledgebase.renesas.com/English_Content/Renesas_Synergy%E2%84%A2_Platform/Renesas_Synergy_Knowledge_Base/r_lvd_Module_Guide_Resources">
+        <constraint display="Unique name required for each instance">
+            "${interface.driver.lvd.${module.driver.lvd.name}}" === "1"
+        </constraint>
+        <constraint display="Requires LVD Interrupt to be enabled">
+            "${module.driver.lvd.lvd_monitor_callback}" === "NULL" || "${module.driver.lvd.monitor_ipl}" != "board.icu.common.irq.disabled"
+        </constraint>
+        <constraint display="Requires detection response to be either interrupt or non-maskable interrupt.">
+            "${module.driver.lvd.monitor_number}" != "module.driver.lvd.monitor_number.MONITOR_1" || "${module.driver.lvd.lvd_monitor_callback}" === "NULL" || ("${module.driver.lvd.detection_response}"=== "module.driver.lvd.detection_response.LVD_RESPONSE_INTERRUPT" || "${module.driver.lvd.detection_response}" === "module.driver.lvd.detection_response.LVD_RESPONSE_NMI")
+        </constraint>
+        <constraint display="Requires detection response to be either interrupt or non-maskable interrupt.">
+            "${module.driver.lvd.monitor_number}" != "module.driver.lvd.monitor_number.MONITOR_2" || "${module.driver.lvd.lvd_monitor_callback}" === "NULL" || ("${module.driver.lvd.detection_response}"=== "module.driver.lvd.detection_response.LVD_RESPONSE_INTERRUPT" || "${module.driver.lvd.detection_response}" === "module.driver.lvd.detection_response.LVD_RESPONSE_NMI")
+        </constraint>
+        <constraint display="Requires LVD Interrupt to be enabled">
+            "${module.driver.lvd.detection_response}" != "module.driver.lvd.detection_response.LVD_RESPONSE_INTERRUPT" || "${module.driver.lvd.monitor_ipl}" != "board.icu.common.irq.disabled"
+        </constraint>
+        <constraint display="Requires LVD Interrupt to be enabled">
+            "${module.driver.lvd.detection_response}" != "module.driver.lvd.detection_response.LVD_RESPONSE_NMI" || "${module.driver.lvd.monitor_ipl}" != "board.icu.common.irq.disabled"
+        </constraint>
+
+        <provides interface="interface.driver.lvd" />
+        <provides interface="interface.driver.lvd.${module.driver.lvd.name}" />
+
+        <property default="g_lvd" display="Name" id="module.driver.lvd.name" description="Module name.">
+            <constraint display="Name must be a valid C symbol">testSymbol("${module.driver.lvd.name}")</constraint>
+        </property>
+
+        <property default="module.driver.lvd.monitor_number.MONITOR_1" display="Monitor number." id="module.driver.lvd.monitor_number" description="Select the LVD monitor.">
+            <option display="1" id="module.driver.lvd.monitor_number.MONITOR_1" value="1"/>
+            <option display="2" id="module.driver.lvd.monitor_number.MONITOR_2" value="2"/>
+        </property>
+        <property default="module.driver.lvd.sample_clock_divisor.LVD_SAMPLE_CLOCK_DISABLED" display="Digital filter, enable by selecting a valid sample clock rate (S7G2 only)." id="module.driver.lvd.sample_clock_divisor" description="Select the digital filter clock divider.">
+            <option display="Digital filter is Disabled." id="module.driver.lvd.sample_clock_divisor.LVD_SAMPLE_CLOCK_DISABLED" value="LVD_SAMPLE_CLOCK_DISABLED"/>
+            <option display="Digital filter enabled, sampling clock is LOCO/2." id="module.driver.lvd.sample_clock_divisor.LVD_SAMPLE_CLOCK_LOCO_DIV_2" value="LVD_SAMPLE_CLOCK_LOCO_DIV_2"/>
+            <option display="Digital filter enabled, sampling clock is LOCO/4." id="module.driver.lvd.sample_clock_divisor.LVD_SAMPLE_CLOCK_LOCO_DIV_4" value="LVD_SAMPLE_CLOCK_LOCO_DIV_4"/>
+            <option display="Digital filter enabled, sampling clock is LOCO/8." id="module.driver.lvd.sample_clock_divisor.LVD_SAMPLE_CLOCK_LOCO_DIV_8" value="LVD_SAMPLE_CLOCK_LOCO_DIV_8"/>
+            <option display="Digital filter enabled, sampling clock is LOCO/16." id="module.driver.lvd.sample_clock_divisor.LVD_SAMPLE_CLOCK_LOCO_DIV_16" value="LVD_SAMPLE_CLOCK_LOCO_DIV_16"/>
+        </property>
+        <property default="" display="Voltage Threshold." id="module.driver.lvd.voltage_threshold" description="Select the low voltage detection threshold.">
+           <select enum="enum.mcu.lvd.monitor" />
+        </property>
+        <property default="module.driver.lvd.detection_response.LVD_RESPONSE_INTERRUPT" display="Detection Response, either reset, interrupt, non-maskable interrupt, or no response (polling mode)." id="module.driver.lvd.detection_response" description="Select what happens when the voltage crosses the threshold voltage.">
+            <option display="Maskable interrupt triggered when voltage crosses the detection threshold." id="module.driver.lvd.detection_response.LVD_RESPONSE_INTERRUPT" value="LVD_RESPONSE_INTERRUPT"/>
+            <option display="Non-maskable interrupt triggered when voltage crosses the detection threshold." id="module.driver.lvd.detection_response.LVD_RESPONSE_NMI" value="LVD_RESPONSE_NMI"/>
+            <option display="Reset MCU when voltage falls below the detection threshold." id="module.driver.lvd.detection_response.LVD_RESPONSE_RESET" value="LVD_RESPONSE_RESET"/>
+            <option display="No response, driver will be in polled mode (using statusGet and statusClear functions)." id="module.driver.lvd.detection_response.LVD_RESPONSE_NONE" value="LVD_RESPONSE_NONE"/>
+        </property>
+        <property default="module.driver.lvd.voltage_slope.LVD_VOLTAGE_SLOPE_FALLING" display="Voltage slope, rising or falling voltage or both." id="module.driver.lvd.voltage_slope" description="Select increasing or decreasing voltage for trigger.">
+            <option display="Threshold crossing detected with decreasing voltage." id="module.driver.lvd.voltage_slope.LVD_VOLTAGE_SLOPE_FALLING" value="LVD_VOLTAGE_SLOPE_FALLING"/>
+            <option display="Threshold crossing detected with increasing voltage." id="module.driver.lvd.voltage_slope.LVD_VOLTAGE_SLOPE_RISING" value="LVD_VOLTAGE_SLOPE_RISING"/>
+            <option display="Threshold crossing detected with increasing or decreasing voltage." id="module.driver.lvd.voltage_slope.LVD_VOLTAGE_SLOPE_BOTH" value="LVD_VOLTAGE_SLOPE_BOTH"/>
+        </property>
+        <property default="module.driver.lvd.negation_delay.LVD_NEGATION_DELAY_FROM_RESET" display="Negation of the monitor signal can either be delayed from the reset event or from voltage returning to normal range." id="module.driver.lvd.negation_delay" description="Select how long the reset signal will be masked.">
+            <option display="Negation of reset signal is based on delay from reset." id="module.driver.lvd.negation_delay.LVD_NEGATION_DELAY_FROM_RESET" value="LVD_NEGATION_DELAY_FROM_RESET"/>
+            <option display="Negation of reset signal is based on delay from voltage returning to normal range." id="module.driver.lvd.negation_delay.LVD_NEGATION_DELAY_FROM_VOLTAGE" value="LVD_NEGATION_DELAY_FROM_VOLTAGE"/>
+        </property>
+        <property default="NULL" display="Monitor Interrupt Callback." id="module.driver.lvd.lvd_monitor_callback" description="A user callback function can be provided. If this callback function is provided, it will be called from the interrupt service routine (ISR) each time the IRQ triggers.">
+            <constraint display="Name must be a valid C symbol.">testSymbol("${module.driver.lvd.lvd_monitor_callback}")</constraint>
+        </property>
+
+        <property default="" display="LVD Monitor Interrupt Priority" id="module.driver.lvd.monitor_ipl" description="Select the LVD Monitor interrupt priority">
+            <select enum="enum.mcu.nvic.priorities.optional"/>
+        </property>
+
+        <header>
+
+/**
+ * LVD Instance
+ */
+
+extern const lvd_instance_t ${module.driver.lvd.name};
+#ifndef ${module.driver.lvd.lvd_monitor_callback}
+void ${module.driver.lvd.lvd_monitor_callback}(lvd_callback_args_t * p_args);
+#endif
+
+/**
+ * End LVD Instance
+ */
+
+        </header>
+        <includes>
+#include &quot;r_lvd.h&quot;
+#include &quot;r_lvd_api.h&quot;
+        </includes>
+        <declarations>
+/**
+ * LVD Instance
+ */
+
+#if ${module.driver.lvd.monitor_ipl} != BSP_IRQ_DISABLED
+#if !defined(SSP_SUPPRESS_ISR_${module.driver.lvd.name}) &amp;&amp; !defined(SSP_SUPPRESS_ISR_LVD${module.driver.lvd.monitor_number})
+SSP_VECTOR_DEFINE(lvd_lvd_isr, LVD, LVD${module.driver.lvd.monitor_number});
+#endif
+#endif
+
+/* Extension structure for mcu specific configuration for ${module.driver.lvd.name} */
+static const lvd_extend_t ${module.driver.lvd.name}_extend =
+{
+    .negation_delay             = ${module.driver.lvd.negation_delay},
+    .sample_clock_divisor       = ${module.driver.lvd.sample_clock_divisor},
+};
+
+/* Configuration structure for ${module.driver.lvd.name} */
+const lvd_cfg_t ${module.driver.lvd.name}_cfg =
+{
+    /** LVD settings */
+    .monitor_number               = ${module.driver.lvd.monitor_number},
+    .voltage_threshold            = ${module.driver.lvd.voltage_threshold},
+    .detection_response           = ${module.driver.lvd.detection_response},
+    .voltage_slope                = ${module.driver.lvd.voltage_slope},
+    .p_callback                   = ${module.driver.lvd.lvd_monitor_callback},
+    .p_context                    = &amp;${module.driver.lvd.name},
+    .p_extend                     = &amp;${module.driver.lvd.name}_extend,
+    .monitor_ipl                  = ${module.driver.lvd.monitor_ipl},
+};
+
+/* Control structure for ${module.driver.lvd.name} */
+lvd_instance_ctrl_t ${module.driver.lvd.name}_ctrl;
+
+const lvd_instance_t ${module.driver.lvd.name} =
+{
+    .p_api = &amp;g_lvd_on_lvd,
+    .p_cfg = &amp;${module.driver.lvd.name}_cfg,
+    .p_ctrl = &amp;${module.driver.lvd.name}_ctrl,
+};
+
+/**
+ * End LVD Instance
+ */
+        </declarations>
+    </module>
+
+</synergyModuleDescription>

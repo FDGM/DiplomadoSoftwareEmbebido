@@ -1,0 +1,38 @@
+<?xml version="1.0" ?>
+<synergyModuleDescription>
+	<config id="config.framework.sf_cellular_common" path="ssp_cfg/framework/sf_cellular_common_cfg.h" version="0">
+		<property default="config.framework.sf_cellular_common.param_checking_enable.bsp" display="Parameter Checking" id="module.framework.sf_cellular_common.param_checking_enable" description="Selects if code for parameter checking is to be included in the build.">
+			<option display="Default (BSP)" id="config.framework.sf_cellular_common.param_checking_enable.bsp" value="(BSP_CFG_PARAM_CHECKING_ENABLE)"/>
+			<option display="Enabled" id="module.framework.sf_cellular_common.param_checking_enable.enabled" value="(1)"/>
+			<option display="Disabled" id="module.framework.sf_cellular_common.param_checking_enable.disabled" value="(0)"/>
+		</property>
+		<property default="config.framework.sf_cellular_common.debug_log.disable" display="AT command Debug Logging" id="config.framework.sf_cellular_common.debug_log">
+			<option display="Logging Enabled" id="config.framework.sf_cellular_common.debug_log.enable" value="(1U)"/>
+			<option display="Logging Disabled" id="config.framework.sf_cellular_common.debug_log.disable" value="(0U)"/>
+		</property>
+		 <property default="sf_cellular_debug_log" display="AT command Debug Log Function Name" id="config.framework.sf_cellular_common.debug_log_function_name" description="Specify the function name to log/print AT command">
+          <constraint display="Name must be a valid C symbol">testSymbol("${config.framework.sf_cellular_common.debug_log_function_name}")</constraint>
+        </property>
+		<content>
+		#ifndef SF_CELLULAR_COMMON_CFG_PARAM_CHECKING_ENABLE
+		#define SF_CELLULAR_COMMON_CFG_PARAM_CHECKING_ENABLE ${module.framework.sf_cellular_common.param_checking_enable}
+		#endif
+		
+		/** AT command logging */
+		#ifndef SF_CELLULAR_DEBUGGING_LOG_ENABLED
+		#define SF_CELLULAR_DEBUGGING_LOG_ENABLED               (${config.framework.sf_cellular_common.debug_log})
+		#endif
+
+		#if SF_CELLULAR_DEBUGGING_LOG_ENABLED
+		/** User can log/print AT command and response received from modem in the following function */
+		#define SF_CELLULAR_DEBUG_LOG                           (${config.framework.sf_cellular_common.debug_log_function_name})
+		#else
+		#define SF_CELLULAR_DEBUG_LOG
+		#endif
+		</content>
+	</config>
+	<module config="config.framework.sf_cellular_common" id="module.framework.sf_cellular_common" display="Framework|Networking|Cellular|SF Cellular Framework Common" version="1">
+		<requires interface="_rtos" />
+		<provides interface="interface.framework.sf_cellular_common" />
+	</module>
+</synergyModuleDescription>

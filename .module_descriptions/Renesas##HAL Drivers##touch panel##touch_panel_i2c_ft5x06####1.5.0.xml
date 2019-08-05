@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" ?>
+<synergyModuleDescription>
+	<module config="config.external.ex_touch_panel_i2c_ft5x06" display="Driver|Input|Touch Panel Driver on touch_panel_ft5x06" id="module.external.ex_touch_panel_i2c_ft5x06_on_ex_touch_panel_i2c_ft5x06" version="1" url="https://knowledgebase.renesas.com/English_Content/Renesas_Synergy%E2%84%A2_Platform/Renesas_Synergy_Knowledge_Base/sf_touch_panel_i2c_Module_Guide_Resources">
+      <requires interface="_rtos" />
+      <provides interface="interface.external.ex_touch_panel" />
+	  <!-- Give name of the instance structure used in the driver in the value field -->
+      <property id="module.external.ex_touch_panel.name" display="Name" default="module.external.ex_touch_panel.name.ft5x06">
+         <option display="g_sf_touch_panel_i2c_chip_ft5x06" id="module.external.ex_touch_panel.name.ft5x06" value="g_sf_touch_panel_i2c_chip_ft5x06" />
+      </property>
+	</module>
+</synergyModuleDescription>

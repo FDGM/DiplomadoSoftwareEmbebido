@@ -1,0 +1,9 @@
+Debug
+/
+guix_studio/
+.settings/
+*.elf
+*.map
+*.srec
+*.o
+*.gxp

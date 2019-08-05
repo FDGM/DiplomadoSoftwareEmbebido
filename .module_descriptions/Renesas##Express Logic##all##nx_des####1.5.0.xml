@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<synergyModuleDescription>
+    <module display="X-Ware|NetX|NetX DES" id="module.el.nx_des" common="1" version="1" url="https://knowledgebase.renesas.com/English_Content/Renesas_Synergy%E2%84%A2_Platform/Renesas_Synergy_Knowledge_Base/NetX_DES_Module_Guide_Resources">
+        <requires interface="_rtos" />
+        <!-- There is only one NetX DES component at this time -->
+        <provides interface="interface.el.nx_des" />
+        <provides interface="interface.el.nx_original_des" />
+        <provides interface="interface.el.nxd_des" />
+        <includes>
+        </includes>
+    </module>
+</synergyModuleDescription>

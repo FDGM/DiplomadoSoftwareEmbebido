@@ -1,0 +1,102 @@
+﻿<?xml version="1.0" ?>
+<synergyModuleDescription>
+  <!-- Memory QSPI Framework -->
+  <config id="config.framework.sf_memory_qspi_nor" path="ssp_cfg/framework/sf_memory_qspi_nor_cfg.h" version="0">
+    <!-- Memory QSPI Framework Config Properties -->
+    <property default="config.framework.sf_memory_qspi_nor.param_checking_enable.bsp"
+              display="Parameter Checking"
+              id="config.framework.sf_memory_qspi_nor.param_checking_enable"
+              description="Selects if code for parameter checking is to be included in the build.">
+      <option display="Default (BSP)"
+              id="config.framework.sf_memory_qspi_nor.param_checking_enable.bsp"
+              value="(BSP_CFG_PARAM_CHECKING_ENABLE)"/>
+      <option display="Enabled" id="config.framework.sf_memory_qspi_nor.param_checking_enable.enabled" value="(1)"/>
+      <option display="Disabled" id="config.framework.sf_memory_qspi_nor.param_checking_enable.disabled" value="(0)"/>
+    </property>
+
+    <content>
+      #define SF_MEMORY_QSPI_NOR_CFG_PARAM_CHECKING_ENABLE ${config.framework.sf_memory_qspi_nor.param_checking_enable}
+    </content>
+  </config>
+
+  <!-- Memory QSPI Framework Module Instance -->
+  <module visible="true"
+          config="config.framework.sf_memory_qspi_nor"
+          display="Framework|Memory|${module.framework.sf_memory_qspi_nor.name} Memory Framework on sf_memory_qspi_nor"
+          id="module.framework.sf_memory_qspi_nor"
+          version="1"
+          url="https://knowledgebase.renesas.com/English_Content/Renesas_Synergy%E2%84%A2_Platform/Renesas_Synergy_Knowledge_Base/sf_memory_qspi_nor_Module_Guide_Resources">
+
+    <!-- Module Constraints -->
+    <constraint display="Module instances must have unique names">
+      "${interface.framework.sf_memory_qspi_nor.${module.framework.sf_memory_qspi_nor.name}}" === "1"
+    </constraint>
+    <constraint display="Requires QSPI Driver">
+      testExists("${module.framework.sf_memory_qspi_nor.requires.qspi_driver::module.driver.qspi.name}")
+    </constraint>
+
+    <!-- Module Dependencies -->
+    <requires interface="_rtos" />
+    <requires id="module.framework.sf_memory_qspi_nor.requires.qspi_driver"
+              interface="interface.driver.qspi"
+              display="Add qspi driver" />
+
+    <!-- Module Exports -->
+    <provides interface="interface.framework.sf_memory_qspi" />
+    <provides interface="interface.framework.sf_memory_qspi_nor" />
+    <provides interface="interface.framework.sf_memory_qspi_nor_on_sf_memory_qspi_nor" />
+    <provides interface="interface.framework.sf_memory_qspi_nor.${module.framework.sf_memory_qspi_nor.name}" />
+
+    <!-- Module Instance Properties -->
+    <property id="module.framework.sf_memory_qspi_nor.name"
+              display="Name"
+              default="g_sf_memory_qspi_nor${_instance}"
+              description="Module Name">
+      <constraint display="Name must be a valid C symbol">
+        testSymbol("${module.framework.sf_memory_qspi_nor.name}")
+      </constraint>
+    </property>
+    <property id="module.framework.sf_memory_qspi_nor.timeout_ticks"
+              display="Write or Erase Timeout(in ticks)"
+              default="30000"
+              description="Timeout ticks for waiting on write or erase to complete">
+      <constraint display="Value must be a positive integer greater than 0">
+        testInteger("${module.framework.sf_memory_qspi_nor.timeout_ticks}") &amp;&amp;
+        ("${module.framework.sf_memory_qspi_nor.timeout_ticks}" &gt; 0)
+      </constraint>
+    </property>
+
+    <!-- Header Contents -->
+    <header>
+      extern sf_memory_qspi_nor_cfg_t ${module.framework.sf_memory_qspi_nor.name}_cfg;
+    </header>
+
+    <includes>
+      #include &quot;sf_memory_qspi_nor.h&quot;
+    </includes>
+
+    <declarations>
+
+      /* SF_MEMORY QSPI NOR ${module.framework.sf_memory_qspi_nor.name} */
+      sf_memory_qspi_nor_cfg_t ${module.framework.sf_memory_qspi_nor.name}_cfg =
+      {
+          .p_qspi = &amp;${module.framework.sf_memory_qspi_nor.requires.qspi_driver::module.driver.qspi.name},
+          .timeout_ticks = ${module.framework.sf_memory_qspi_nor.timeout_ticks}
+      };
+
+      /* SF_MEMORY QSPI NOR instance control */
+      static sf_memory_qspi_nor_instance_ctrl_t ${module.framework.sf_memory_qspi_nor.name}_ctl;
+
+      /* SF_MEMORY QSPI config */
+      static sf_memory_cfg_t ${module.framework.sf_memory_qspi_nor.name}_memory_cfg = {.p_extend = &amp;${module.framework.sf_memory_qspi_nor.name}_cfg};
+
+      /* SF_MEMORY instance */
+      static sf_memory_instance_t ${module.framework.sf_memory_qspi_nor.name} =
+      {
+          .p_ctrl = &amp;${module.framework.sf_memory_qspi_nor.name}_ctl,
+          .p_cfg =  &amp;${module.framework.sf_memory_qspi_nor.name}_memory_cfg,
+          .p_api = &amp;g_sf_memory_on_sf_memory_qspi_nor
+      };
+    </declarations>
+  </module>
+</synergyModuleDescription>

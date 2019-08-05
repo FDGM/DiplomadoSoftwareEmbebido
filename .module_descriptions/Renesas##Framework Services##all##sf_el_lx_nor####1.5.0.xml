@@ -1,0 +1,88 @@
+﻿<?xml version="1.0" ?>
+<synergyModuleDescription>
+  <!-- LevelX NOR Framework -->
+  <config id="config.framework.sf_el_lx_nor" path="ssp_cfg/framework/sf_el_lx_nor_cfg.h" version="0">
+    <!-- LevelX NOR Framework Config Properties -->
+    <property default="config.framework.sf_el_lx_nor.param_checking_enable.bsp"
+              display="Parameter Checking"
+              id="config.framework.sf_el_lx_nor.param_checking_enable"
+              description="Selects if code for parameter checking is to be included in the build.">
+      <option display="Default (BSP)" id="config.framework.sf_el_lx_nor.param_checking_enable.bsp"
+              value="(BSP_CFG_PARAM_CHECKING_ENABLE)"/>
+      <option display="Enabled" id="config.framework.sf_el_lx_nor.param_checking_enable.enabled" value="(1)"/>
+      <option display="Disabled" id="config.framework.sf_el_lx_nor.param_checking_enable.disabled" value="(0)"/>
+    </property>
+
+    <!-- Header Content   -->
+    <content>
+      #define SF_EL_LX_NOR_CFG_PARAM_CHECKING_ENABLE ${config.framework.sf_el_lx_nor.param_checking_enable}
+    </content>
+  </config>
+
+  <!-- LevelX NOR Module Instance -->
+  <module config="config.framework.sf_el_lx_nor"
+          display="Framework|LevelX|${module.framework.sf_el_lx_nor.name} Port LevelX Framework on sf_el_lx_nor"
+          id="module.framework.sf_el_lx_nor"
+          version="1"
+          url="https://knowledgebase.renesas.com/English_Content/Renesas_Synergy%E2%84%A2_Platform/Renesas_Synergy_Knowledge_Base/sf_el_lx_nor_Module_Guide_Resources">
+
+    <!-- Module Constraints -->
+    <constraint display="Module instances must have unique names">
+      "${interface.framework.sf_el_lx_nor.${module.framework.sf_el_lx_nor.name}}" === "1"
+    </constraint>
+
+    <!-- Module Dependencies   -->
+    <requires interface="_rtos" />
+    <requires id="module.framework.sf_el_lx_nor.requires.sf_block_media"
+              interface="interface.framework.sf_memory_qspi"
+              display="Add Block Media Driver" />
+
+    <!-- Module Exports -->
+    <provides interface="interface.framework.sf_el_lx_nor" />
+    <provides interface="interface.framework.sf_el_lx_nor_on_sf_el_lx_nor" />
+    <provides interface="interface.framework.sf_el_lx_nor.${module.framework.sf_el_lx_nor.name}" />
+
+    <!-- Module Instance Properties -->
+    <property id="module.framework.sf_el_lx_nor.name"
+              display="Name"
+              default="g_sf_el_lx_nor${_instance}"
+              description="Module Name">
+      <constraint display="Name must be a valid C symbol">
+        testSymbol("${module.framework.sf_el_lx_nor.name}")
+      </constraint>
+    </property>
+    <property id="module.framework.sf_el_lx_nor.p_callback"
+              display="Event Callback"
+              default="NULL"
+              description="Name of the function to call when an event occured">
+      <constraint display="Name must be a valid C symbol">
+        testSymbol("${module.framework.sf_el_lx_nor.p_callback}")
+      </constraint>
+    </property>
+
+    <header>
+      #include "sf_el_lx_nor.h"
+
+      #ifndef ${module.framework.sf_el_lx_nor.p_callback}
+      void ${module.framework.sf_el_lx_nor.p_callback}(sf_el_lx_nor_callback_args_t * p_args);
+      #endif
+    </header>
+
+    <includes>
+      #include &quot;sf_el_lx_nor.h&quot;
+    </includes>
+
+    <declarations>
+
+      /* sf_el_lx_nor driver instance control block */
+      static sf_el_lx_nor_instance_ctrl_t ${module.framework.sf_el_lx_nor.name}_ctrl;
+
+      /* sf_el_lx_nor driver config block */
+      static sf_el_lx_nor_instance_cfg_t  ${module.framework.sf_el_lx_nor.name}_cfg =
+      {
+        .p_lower_lvl = &amp;${module.framework.sf_el_lx_nor.requires.sf_block_media::module.framework.sf_memory_qspi_nor.name},
+        .p_callback = ${module.framework.sf_el_lx_nor.p_callback}
+      };
+    </declarations>
+  </module>
+</synergyModuleDescription>

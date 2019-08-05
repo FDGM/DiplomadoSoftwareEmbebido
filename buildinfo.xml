@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<buildInfo version="1.1.0">
+  <sourcePaths>
+    <path value="src"/>
+    <path value="synergy"/>
+  </sourcePaths>
+  <includePaths>
+    <path value="src"/>
+    <path value="src/synergy_gen"/>
+    <path value="synergy/ssp/inc"/>
+    <path value="synergy/ssp/inc/bsp"/>
+    <path value="synergy/ssp/inc/bsp/cmsis/Include"/>
+    <path value="synergy/ssp/inc/driver/api"/>
+    <path value="synergy/ssp/inc/driver/instances"/>
+    <path value="synergy/ssp/inc/framework/api"/>
+    <path value="synergy/ssp/inc/framework/el"/>
+    <path value="synergy/ssp/inc/framework/instances"/>
+    <path value="synergy/ssp/inc/framework/tes"/>
+    <path value="synergy/ssp/src/framework/el/tx"/>
+    <path value="synergy_cfg/ssp_cfg/bsp"/>
+    <path value="synergy_cfg/ssp_cfg/driver"/>
+    <path value="synergy_cfg/ssp_cfg/framework"/>
+    <path value="synergy_cfg/ssp_cfg/framework/el"/>
+    <path value="synergy_cfg/ssp_cfg/framework/tes"/>
+  </includePaths>
+  <libraryPaths>
+    <path value="synergy/ssp/src/bsp/cmsis/DSP_Lib/cm4_iar"/>
+    <path value="synergy/ssp/src/framework/el/gx/cm4_iar"/>
+    <path value="synergy/ssp/src/framework/el/tx/cm4_iar"/>
+  </libraryPaths>
+  <libraryNames>
+    <name value="libDSP_Lib.a"/>
+    <name value="libgx.a"/>
+    <name value="libtx.a"/>
+  </libraryNames>
+  <linkerScript path="script/S7G2.icf"/>
+  <cpuType value="cortex-m4"/>
+  <targetDeviceName value="R7FS7G27H"/>
+  <entrySymbol value="Reset_Handler"/>
+  <filesToFormat/>
+</buildInfo>

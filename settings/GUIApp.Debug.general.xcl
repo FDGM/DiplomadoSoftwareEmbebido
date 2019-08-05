@@ -1,0 +1,17 @@
+"C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.100 EWSYN_3\arm\bin\armproc.dll" 
+
+"C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.100 EWSYN_3\arm\bin\armjlink2.dll" 
+
+"C:\WIP\SSP_140_activities\Re_Release\Hello_World\IAR\GUIApp_SK_S7G2\Debug\Exe\GUIApp.out" 
+
+--plugin "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.100 EWSYN_3\arm\bin\armbat.dll" 
+
+--device_macro "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.100 EWSYN_3\arm\config\debugger\Renesas\R7FSx.dmac" 
+
+--device_macro "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.100 EWSYN_3\arm\config\debugger\Renesas\R7FS7G2x.dmac" 
+
+--flash_loader "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.100 EWSYN_3\arm\config\flashloader\Renesas\FlashR7FS7G27H.board" 
+
+
+
+

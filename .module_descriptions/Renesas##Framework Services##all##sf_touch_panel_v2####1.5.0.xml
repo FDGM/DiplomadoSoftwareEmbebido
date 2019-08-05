@@ -1,0 +1,153 @@
+﻿<?xml version="1.0" ?>
+<synergyModuleDescription>
+    <config id="config.framework.sf_touch_panel_v2" path="ssp_cfg/framework/sf_touch_panel_v2_cfg.h" version="0">
+        <property default="config.framework.sf_touch_panel_v2.param_checking_enable.bsp" display="Parameter Checking" id="config.framework.sf_touch_panel_v2.param_checking_enable" description="Selects if code for parameter checking is to be included in the build.">
+            <option display="Default (BSP)" id="config.driver.sf_touch_panel_v2.param_checking_enable.bsp" value="(BSP_CFG_PARAM_CHECKING_ENABLE)"/>
+            <option display="Enabled" id="config.framework.sf_touch_panel_v2.param_checking_enable.enabled" value="(1)"/>
+            <option display="Disabled" id="config.framework.sf_touch_panel_v2.param_checking_enable.disabled" value="(0)"/>
+        </property>
+        <property default="512" display="Thread Stack Size" id="config.framework.sf_touch_panel_v2.thread_stack_size" description="Specify the touch panel thread stack size.">
+            <constraint display="Value must be a non-negative integer">testInteger("${config.framework.sf_touch_panel_v2.thread_stack_size}")  &amp;&amp; ("${config.framework.sf_touch_panel_v2.thread_stack_size}" &gt;= 0)</constraint>
+        </property>
+        <content>
+        #define SF_TOUCH_PANEL_V2_CFG_PARAM_CHECKING_ENABLE ${config.framework.sf_touch_panel_v2.param_checking_enable}
+        #define SF_TOUCH_PANEL_V2_CFG_THREAD_STACK_SIZE (${config.framework.sf_touch_panel_v2.thread_stack_size}U)
+        </content>
+    </config>
+    <module config="config.framework.sf_touch_panel_v2" display="Framework|Input|${module.framework.sf_touch_panel_v2.name} Touch Panel V2 Framework on sf_touch_panel_v2" id="module.framework.sf_touch_panel_v2_on_sf_touch_panel_v2" version="1" url="https://knowledgebase.renesas.com/English_Content/Renesas_Synergy%E2%84%A2_Platform/Renesas_Synergy_Knowledge_Base/sf_touch_panel_v2_Module_Guide_Resources">
+        <constraint display="Module instances must have unique names">
+            "${interface.framework.sf_touch_panel_v2.${module.framework.sf_touch_panel_v2.name}}" === "1"
+        </constraint>
+        <constraint display="Requires Touch driver">
+            testExists("${module.framework.sf_touch_panel_v2_on_sf_touch_panel_v2.requires.ex_touch_chip::module.external.ex_touch_panel_chip.name}")
+        </constraint>
+        <requires interface="_rtos" />
+        <requires id="module.framework.sf_touch_panel_v2_on_sf_touch_panel_v2.requires.ex_touch_chip" interface="interface.external.ex_touch_panel_chip" display="Add Touch Driver" />
+        <provides interface="interface.framework.sf_touch_panel_v2" />
+        <provides interface="interface.framework.sf_touch_panel_v2_on_sf_touch_panel_v2" />
+        <provides interface="interface.framework.sf_touch_panel_v2.${module.framework.sf_touch_panel_v2.name}" />
+        <property default="g_sf_touch_panel_v2_${_instance}" display="Name" id="module.framework.sf_touch_panel_v2.name" description="Module name">
+            <constraint display="Name must be a valid C symbol">testSymbol("${module.framework.sf_touch_panel_v2.name}")</constraint>
+        </property>
+        <property default="3" display="Thread Priority" id="module.framework.sf_touch_panel_v2.priority" description="Specify the thread priority.">
+            <constraint display="Value must be a non-negative integer">testInteger("${module.framework.sf_touch_panel_v2.priority}")  &amp;&amp; ("${module.framework.sf_touch_panel_v2.priority}" &gt;= 0)</constraint>
+        </property>
+        <property default="10" display="Update Hz" id="module.framework.sf_touch_panel_v2.update_hz" description="Specify the update rate in Hertz.">
+            <constraint display="Value must be an integer greater than 0">testInteger("${module.framework.sf_touch_panel_v2.update_hz}")  &amp;&amp; ("${module.framework.sf_touch_panel_v2.update_hz}" &gt; 0)</constraint>
+        </property>
+        <property id="module.framework.sf_touch_panel_v2.rotation_angle" display="Touch Coordinate Rotation Angle(Clockwise)" default="module.framework.sf_touch_panel_v2.rotation_angle.angle0" description="Select the touch coordinate rotation angle.">
+            <option display="0" id="module.framework.sf_touch_panel_v2.rotation_angle.angle0" value="0"/>
+            <option display="90 (select this if 'Screen Rotation Angle' in GUIX Port is '270')" id="module.framework.sf_touch_panel_v2.rotation_angle.angle_90" value="90"/>
+            <option display="180" id="module.framework.sf_touch_panel_v2.rotation_angle.angle_180" value="180"/>
+            <option display="270 (select this if 'Screen Rotation Angle' in GUIX Port is '90')" id="module.framework.sf_touch_panel_v2.rotation_angle.angle_270" value="270"/>
+        </property>
+        <property default="sf_touch_panel_v2_init${_instance}" display="Name of generated initialization function" id="module.framework.sf_touch_panel_v2.init_function" description="Specify the name of the generated initialization function.">
+            <constraint display="Name must be a valid C symbol">testSymbol("${module.framework.sf_touch_panel_v2.init_function}")</constraint>
+        </property>
+        <property default="module.framework.sf_touch_panel_v2.init.enable" display="Auto Initialization" id="module.framework.sf_touch_panel_v2.init" description="Select if sf_touch_panel_v2 will be initialized during startup.">
+            <option display="Enable"  id="module.framework.sf_touch_panel_v2.init.enable"  value="1"/>
+            <option display="Disable" id="module.framework.sf_touch_panel_v2.init.disable" value="0"/>
+        </property>
+        <property default="module.framework.sf_touch_panel_v2.auto_start.enable" display="Auto Start" id="module.framework.sf_touch_panel_v2.auto_start" description="Enabling this will start to get the touch data.">
+            <option display="Enable"  id="module.framework.sf_touch_panel_v2.auto_start.enable"  value="1"/>
+            <option display="Disable" id="module.framework.sf_touch_panel_v2.auto_start.disable" value="0"/>
+        </property>
+        <!-- External defined callback function -->
+        <property default="NULL" display="Name of touchpanel callback function to be defined by user" id="module.framework.sf_touch_panel_v2.callback">
+            <constraint display="Name must be a valid C symbol">testSymbol("${module.framework.sf_touch_panel_v2.callback}")</constraint>
+        </property>
+		
+        <header>
+            /** SF Touch Panel V2 on SF Touch Panel V2 Instance. */
+            extern const sf_touch_panel_v2_instance_t ${module.framework.sf_touch_panel_v2.name};
+            void ${module.framework.sf_touch_panel_v2.name}_err_callback(void * p_instance, void * p_data);
+            #ifndef ${module.framework.sf_touch_panel_v2.callback}
+            void ${module.framework.sf_touch_panel_v2.callback}(sf_touchpanel_v2_callback_args_t * p_args);
+            #endif			
+            void ${module.framework.sf_touch_panel_v2.init_function}(void);
+        </header>
+        <includes>
+            #include &quot;sf_touch_panel_v2.h&quot;
+            #include &quot;sf_touch_panel_v2_api.h&quot;
+        </includes>
+        <declarations>
+            #if defined(__ICCARM__)
+            #define ${module.framework.sf_touch_panel_v2.name}_err_callback_WEAK_ATTRIBUTE
+            #pragma weak ${module.framework.sf_touch_panel_v2.name}_err_callback  = ${module.framework.sf_touch_panel_v2.name}_err_callback_internal
+            #elif defined(__GNUC__)
+            #define ${module.framework.sf_touch_panel_v2.name}_err_callback_WEAK_ATTRIBUTE   __attribute__ ((weak, alias("${module.framework.sf_touch_panel_v2.name}_err_callback_internal")))
+            #endif
+            void ${module.framework.sf_touch_panel_v2.name}_err_callback(void * p_instance, void * p_data) ${module.framework.sf_touch_panel_v2.name}_err_callback_WEAK_ATTRIBUTE;
+            sf_touch_panel_v2_instance_ctrl_t ${module.framework.sf_touch_panel_v2.name}_ctrl;
+            const sf_touch_panel_v2_extend_cfg_t ${module.framework.sf_touch_panel_v2.name}_cfg_extend =
+            {
+                .p_chip= &amp;${module.framework.sf_touch_panel_v2_on_sf_touch_panel_v2.requires.ex_touch_chip::module.external.ex_touch_panel_chip.name}
+            };
+            const sf_touch_panel_v2_cfg_t ${module.framework.sf_touch_panel_v2.name}_cfg =
+            {
+                .hsize_pixels        = ${module.framework.sf_touch_panel_v2_on_sf_touch_panel_v2.requires.ex_touch_chip::module.external.ex_touch_panel_chip_hsize.hsize_pixels},
+                .vsize_pixels        = ${module.framework.sf_touch_panel_v2_on_sf_touch_panel_v2.requires.ex_touch_chip::module.external.ex_touch_panel_chip_vsize.vsize_pixels},
+                .priority            = ${module.framework.sf_touch_panel_v2.priority},
+                .update_hz           = ${module.framework.sf_touch_panel_v2.update_hz},
+                .p_extend            = &amp;${module.framework.sf_touch_panel_v2.name}_cfg_extend,
+                .rotation_angle      = ${module.framework.sf_touch_panel_v2.rotation_angle},
+                .p_callback          = ${module.framework.sf_touch_panel_v2.callback},
+                .p_context           = &amp;${module.framework.sf_touch_panel_v2.name}
+            };
+
+            /* Instance structure to use this module. */
+            const sf_touch_panel_v2_instance_t ${module.framework.sf_touch_panel_v2.name} = 
+            {
+                .p_ctrl        = &amp;${module.framework.sf_touch_panel_v2.name}_ctrl,
+                .p_cfg         = &amp;${module.framework.sf_touch_panel_v2.name}_cfg,
+                .p_api         = &amp;g_sf_touch_panel_v2_on_sf_touch_panel_v2
+            };
+            /*******************************************************************************************************************//**
+             * @brief      Initialization function that the user can choose to have called automatically during thread entry.
+             *             The user can call this function at a later time if desired using the prototype below.
+
+             *             - void ${module.framework.sf_touch_panel_v2.name}_err_callback(void * p_instance, void * p_data)
+             *
+             * @param[in]  p_instance arguments used to identify which instance caused the error and p_data Callback arguments
+                           used to identify what error caused the callback.
+             **********************************************************************************************************************/
+            void ${module.framework.sf_touch_panel_v2.name}_err_callback_internal(void * p_instance, void * p_data);
+            void ${module.framework.sf_touch_panel_v2.name}_err_callback_internal(void * p_instance, void * p_data)
+            {
+                /** Suppress compiler warning for not using parameters. */
+                SSP_PARAMETER_NOT_USED(p_instance);
+                SSP_PARAMETER_NOT_USED(p_data);
+                /** An error has occurred. Please check function arguments for more information. */
+                BSP_CFG_HANDLE_UNRECOVERABLE_ERROR(0);
+            }
+            /*******************************************************************************************************************//**
+            * @brief     This is sf touch panel initialization function. User Can call this function in the application 
+                         if required with the below mentioned prototype.
+            *            - void ${module.framework.sf_touch_panel_v2.init_function}(void)
+            **********************************************************************************************************************/
+            void ${module.framework.sf_touch_panel_v2.init_function}(void)
+            {
+                ssp_err_t ssp_err_${module.framework.sf_touch_panel_v2.name};
+                ssp_err_${module.framework.sf_touch_panel_v2.name} = ${module.framework.sf_touch_panel_v2.name}.p_api->open(${module.framework.sf_touch_panel_v2.name}.p_ctrl, ${module.framework.sf_touch_panel_v2.name}.p_cfg);
+                if (SSP_SUCCESS != ssp_err_${module.framework.sf_touch_panel_v2.name})
+                {
+                    ${module.framework.sf_touch_panel_v2.name}_err_callback((void *)&amp;${module.framework.sf_touch_panel_v2.name},&amp;ssp_err_${module.framework.sf_touch_panel_v2.name});
+                }
+                if (${module.framework.sf_touch_panel_v2.auto_start})
+                {
+                    ssp_err_${module.framework.sf_touch_panel_v2.name} = ${module.framework.sf_touch_panel_v2.name}.p_api->start(${module.framework.sf_touch_panel_v2.name}.p_ctrl);
+                    if (SSP_SUCCESS != ssp_err_${module.framework.sf_touch_panel_v2.name})
+                    {
+                        ${module.framework.sf_touch_panel_v2.name}_err_callback((void *)&amp;${module.framework.sf_touch_panel_v2.name},&amp;ssp_err_${module.framework.sf_touch_panel_v2.name});
+                    }
+                }
+            }
+        </declarations>
+        <init>
+            /** Call initialization function if user has selected to do so. */
+            #if (${module.framework.sf_touch_panel_v2.init})
+            ${module.framework.sf_touch_panel_v2.init_function}();
+            #endif
+        </init>
+    </module>
+</synergyModuleDescription>

@@ -1,0 +1,93 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<synergyModuleDescription>
+
+  <!-- LevelX NAND Common -->
+  <config id="config.el.lx_nand_src" path="ssp_cfg/framework/el/lx_nand_src_user.h" version="0">
+    <!-- LevelX NAND Common Config Properties -->
+    <property id="config.el.lx_nand_src.lx_nand_sector_mapping_cache_size"
+              display="Logical sector mapping cache size."
+              default="16"
+              description="By default this value is 16 and defines the logical sector mapping cache size. Large values improve performance, but cost memory. The minimum size is 8 and all values must be a power of 2.">
+      <constraint display="Value must be greater than 8 and power of 2 ">
+        testInteger("${config.el.lx_nand_src.lx_nand_sector_mapping_cache_size}")  &amp;&amp;
+        ("${config.el.lx_nand_src.lx_nand_sector_mapping_cache_size}" &gt;= 8) &amp;&amp;
+        ( ("${config.el.lx_nand_src.lx_nand_sector_mapping_cache_size}" &amp;
+          ("${config.el.lx_nand_src.lx_nand_sector_mapping_cache_size}" - 1)) === 0)
+      </constraint>
+    </property>
+
+    <!-- Header Content -->
+    <content>
+        #define LX_NAND_SECTOR_MAPPING_CACHE_SIZE (${config.el.lx_nand_src.lx_nand_sector_mapping_cache_size})
+    </content>
+  </config>
+
+  <module config="config.el.lx_nand_src"
+          id="module.el.lx_nand_src"
+          display="X-Ware|LevelX|LevelX NAND Common"
+          common="1"
+          version="0">
+    <!-- Because LevelX is distributed only as source linker warnings not observed -->
+    <!-- LevelX NAND Common Module Dependencies -->
+    <requires interface="_rtos" />
+    <requires id="module.el.lx_nand_common.requires.lx_common"
+              interface="interface.el.lx_common"
+              display="Add LevelX Common" />
+
+    <!-- LevelX NAND Common Module Exports -->
+    <provides interface="interface.el.lx_nand_common" />
+
+    <!-- LevelX NAND Common Module Properties -->
+    <property default="lx_nand_common_init${_instance}"
+              display="Name of generated LevelX initialization function"
+              id="module.el.lx_nand_common.init_function"
+              description="LevelX NAND common initialization function name.">
+      <constraint display="Name must be a valid C symbol">
+        testSymbol("${module.el.lx_nand_common.init_function}")
+      </constraint>
+    </property>
+
+    <property default="module.el.lx_nand_common.init.enable"
+              display="Auto Initialization LevelX NAND Common"
+              id="module.el.lx_nand_common.init"
+              description="Control auto initialization of LevelX NAND Common">
+      <option display="Enable"  id="module.el.lx_nand_common.init.enable"  value="1"/>
+      <option display="Disable" id="module.el.lx_nand_common.init.disable" value="0"/>
+    </property>
+
+    <!-- LevelX NAND Common Module Instance header content -->
+    <header>
+      void ${module.el.lx_nand_common.init_function}(void);
+    </header>
+
+    <includes>
+      #include "lx_api.h"
+    </includes>
+    <declarations>
+
+      /* Define initialization */
+      #define LX_NAND_COMMON_INITIALIZE (${module.el.lx_nand_common.init})
+
+      /*******************************************************************************************************************//**
+        * @brief     Initialization function that the user can choose to have called automatically during thread entry.
+        *            The user can call this function at a later time if desired using the prototype below.
+        *            - void ${module.el.lx_nand_common.init_function}(void)
+        **********************************************************************************************************************/
+      void ${module.el.lx_nand_common.init_function}(void)
+      {
+          /** Initialize the LevelX NAND Flash system. */
+          lx_nand_flash_initialize();
+      }
+
+    </declarations>
+    <init>
+
+      /** Call initialization function if user has selected to do so. */
+      #if LX_NAND_COMMON_INITIALIZE
+          ${module.el.lx_nand_common.init_function}();
+      #endif
+
+    </init>
+
+  </module>
+</synergyModuleDescription>
