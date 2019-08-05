@@ -39,7 +39,7 @@ void sensor_thread_entry(void)
             {
               u16ADC_Filtered = u16ADC_Data;
             }
-
+//Parametrización de ADC con PWM
           u16PwmPercent = 100-((100 * u16ADC_Data) / 255);
         FN_bfPerformTick();
         write_message_sensor();
