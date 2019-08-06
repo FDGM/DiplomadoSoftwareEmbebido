@@ -18,4 +18,3 @@ typedef enum e_sf_message_event
 extern TX_QUEUE main_thread_message_queue;
 extern TX_QUEUE control_thread_message_queue;
 #endif /* SF_MESSAGE_PORT_H_ */
-

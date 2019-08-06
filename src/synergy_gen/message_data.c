@@ -45,3 +45,4 @@ void g_message_init(void)
                      &queue_memory_control_thread_message_queue, sizeof(queue_memory_control_thread_message_queue));
 }
 
+
