@@ -333,7 +333,6 @@
   <v1:configSetting configurationId="pb01" altId="pb01.usbhs0.vbus">
     <v1:connectionSetting altId="usbhs0.vbus.pb01"/>
   </v1:configSetting>
-  <v1:configSetting configurationId="p103.gpio_mode" altId="p103.gpio_mode.gpio_mode_peripheral"/>
   <v1:configSetting configurationId="p901.gpio_mode" altId="p901.gpio_mode.gpio_mode_peripheral"/>
   <v1:configSetting configurationId="p113.gpio_drivecapacity" altId="p113.gpio_speed.gpio_speed_medium"/>
   <v1:configSetting configurationId="p801.gpio_mode" altId="p801.gpio_mode.gpio_mode_out.low"/>
@@ -442,9 +441,6 @@
   </v1:configSetting>
   <v1:configSetting configurationId="p104" altId="p104.sci8.rxd">
     <v1:connectionSetting altId="sci8.rxd.p104"/>
-  </v1:configSetting>
-  <v1:configSetting configurationId="p103" altId="p103.gpt2.gtioca">
-    <v1:connectionSetting altId="gpt2.gtioca.p103"/>
   </v1:configSetting>
   <v1:configSetting configurationId="p901" altId="p901.glcdc0.lcd_data15">
     <v1:connectionSetting altId="glcdc0.lcd_data15.p901"/>
@@ -808,10 +804,7 @@
   <v1:configSetting configurationId="p114.gpio_drivecapacity" altId="p114.gpio_speed.gpio_speed_high"/>
   <v1:configSetting configurationId="p114.gpio_pupd" altId="p114.gpio_pupd.gpio_pupd_no_ip_pull"/>
   <v1:configSetting configurationId="p114" altId="p114.output.low"/>
-  <v1:configSetting configurationId="gpt2.mode" altId="gpt2.mode.gtiocaorgtiocb.free"/>
-  <v1:configSetting configurationId="gpt2.gtioca" altId="gpt2.gtioca.p103">
-    <v1:connectionSetting altId="p103.gpt2.gtioca"/>
-  </v1:configSetting>
+  <v1:configSetting configurationId="gpt2.mode" altId="gpt2.mode.disabled"/>
   <v1:configSetting configurationId="gpt1.pairing" altId="gpt1.pairing.free"/>
   <v1:configSetting configurationId="gpt1.gtiocb" altId="gpt1.gtiocb.p406">
     <v1:connectionSetting altId="p406.gpt1.gtiocb"/>

@@ -8,9 +8,9 @@
 
 
 uint16_t u16100msCnt;
-uint8_t u8Pulses;
-uint8_t  u8PulsesAverage;
-uint8_t au8PulsesArray[];
+uint16_t u16Pulses;
+uint16_t  u16PulsesAverage;
+uint16_t au16PulsesArray[2];
 bool bfMainTickElapsed = false;
 int u16TickCnt = C_MAIN_TICK_MS;
 timer_size_t counts = 0;
@@ -21,6 +21,10 @@ void sensor_thread_entry(void)
     g_adc0.p_api->open(g_adc0.p_ctrl, g_adc0.p_cfg);
     g_adc0.p_api->scanCfg(g_adc0.p_ctrl, g_adc0.p_channel_cfg);
     g_adc0.p_api->scanStart(g_adc0.p_ctrl);
+    g_timer2.p_api->open (g_timer2.p_ctrl, g_timer2.p_cfg);
+    g_timer2.p_api->start (g_timer2.p_ctrl);
+    g_timer2.p_api->reset(g_timer2.p_ctrl);
+    g_external_irq10.p_api->open(g_external_irq10.p_ctrl,g_external_irq10.p_cfg);
     while (1)
     {
         /******************************************************/
@@ -40,11 +44,16 @@ void sensor_thread_entry(void)
               u16ADC_Filtered = u16ADC_Data;
             }
 //Parametrización de ADC con PWM
-          u16PwmPercent = 100-((100 * u16ADC_Data) / 255);
+        u16PwmPercent = 100-((100 * u16ADC_Data) / 255);
         FN_bfPerformTick();
         write_message_sensor();
         tx_thread_sleep (1);
     }
+}
+
+void button_callback_SW5(external_irq_callback_args_t *p_args)
+{
+    u16Pulses++;
 }
 
 bool FN_bfPerformTick(void)
@@ -67,10 +76,10 @@ bool FN_bfPerformTick(void)
       if(u16100msCnt >= 100)
           {
                u16100msCnt = 0;
-               au8PulsesArray[0] = au8PulsesArray[1];
-               au8PulsesArray[1] = u8Pulses;
-               u8Pulses = 0;
-               u8PulsesAverage = (au8PulsesArray[0] + au8PulsesArray[1])/2;
+               au16PulsesArray[0] = au16PulsesArray[1];
+               au16PulsesArray[1] = u16Pulses;
+               u16Pulses = 0;
+               u16PulsesAverage = (au16PulsesArray[0] + au16PulsesArray[1])/2;
           }
     }
 
