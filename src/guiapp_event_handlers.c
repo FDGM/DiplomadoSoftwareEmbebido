@@ -101,10 +101,10 @@ void update_duty_cycle(int duty_cycle)
     update_numeric ((GX_WIDGET *) &window3, PR_DUTY_CYCLE, duty_cycle);
 }
 
-void update_speed(int speed)
-{
-    update_numeric ((GX_WIDGET *) &window3, PR_SPEED, speed);
-}
+//void update_speed(int speed)
+//{
+//    update_numeric ((GX_WIDGET *) &window3, PR_SPEED, speed);
+//}
 
 void update_setpoint(int setpoint)
 {
